@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 import { createPortal } from 'react-dom';
-import styles from './Modal.module.css';
+import styles from '../Modal/Modal.module.css';
 import { CgClose } from 'react-icons/cg';
 
-const modalRoot = document.querySelector('#modal-root');
+const modalRoot = document.querySelector('#root');
 
 class Modal extends Component {
   componentDidMount() {
@@ -44,3 +45,8 @@ class Modal extends Component {
 }
 
 export default Modal;
+
+Modal.propTypes = {
+  close: PropTypes.func.isRequired,
+  children: PropTypes.element.isRequired,
+};

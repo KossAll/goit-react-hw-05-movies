@@ -74,22 +74,18 @@ class SearchImages extends Component {
 
   render() {
     const body = document.querySelector('body');
-    const { items, loading, err, total, page, showModal, imgDetails } =
-      this.state;
+    const { items, loading, err, showModal, imgDetails } = this.state;
     const { searchImages, loadMore, closeModal, openModal } = this;
-    const isImages = Boolean(items.length);
-    const totalPage = Math.ceil(total / 12);
 
     return (
       <div className={styles.search_images}>
         <Searchbar onSubmit={searchImages} />
-        <ImageGallery items={items} onClick={openModal} />
-
-        {loading && <Loader />}
+        {items.length > 0 && <ImageGallery items={items} onClick={openModal} />}
 
         {err && <p className={styles.errorMessage}>{err}</p>}
 
-        {isImages && page < totalPage && (
+        {loading && <Loader />}
+        {Boolean(items.length) && !loading && (
           <Button onLoadMore={loadMore} text={'Load more'} />
         )}
 
