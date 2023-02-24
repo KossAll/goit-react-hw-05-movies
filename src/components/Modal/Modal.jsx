@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import styles from '../Modal/Modal.module.css';
 import { CgClose } from 'react-icons/cg';
 
-const modalRoot = document.querySelector('#root');
+const modalRoot = document.querySelector('#modal-root');
 
 class Modal extends Component {
   componentDidMount() {
