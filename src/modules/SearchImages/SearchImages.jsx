@@ -1,8 +1,8 @@
-import { Component } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Searchbar from '../Searchbar/Searchbar';
 import ImageGallery from '../ImageGallery/ImageGallery';
-import { fetchImages } from '../../components/post-api';
+import { fetchData } from '../../components/post-api';
 import Button from '../../components/Button/Button';
 import Loader from '../../components/Loader/Loader';
 import Modal from '../../components/Modal/Modal';
@@ -10,97 +10,89 @@ import { toast } from 'react-toastify';
 
 import styles from '../SearchImages/SearchImages.module.css';
 
-class SearchImages extends Component {
-  state = {
-    search: '',
-    items: [],
-    loading: false,
-    err: null,
-    page: 1,
-    showModal: false,
-    total: 0,
-    imgDetails: null,
-  };
+const SearchImages = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [err, setErr] = useState(null);
+  const [imgDetails, setimgDetails] = useState(null);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { search, page } = this.state;
-    if (prevState.search !== search || prevState.page !== page) {
-      this.setState({ loading: true });
-      this.fetchImages();
+  useEffect(() => {
+    if (searchQuery === '') {
+      return;
     }
-  }
 
-  async fetchImages() {
-    try {
-      const { search, page } = this.state;
-      const { hits, totalHits } = await fetchImages(search, page);
-      if (hits.length === 0) {
-        toast.error('No result found!');
+    const fetchImages = async () => {
+      try {
+        setLoading(true);
+        const { hits, totalHits } = await fetchData(searchQuery, page);
+        if (hits.length === 0) {
+          toast.error('No result found!');
+        }
+        setItems(items => [...items, ...hits]);
+        setTotal(totalHits);
+      } catch (err) {
+        setErr(err.message);
+      } finally {
+        setLoading(false);
       }
-      this.setState(({ items }) => ({
-        items: [...items, ...hits],
-        total: totalHits,
-      }));
-    } catch (err) {
-      this.setState({ err: err.message });
-    } finally {
-      this.setState({ loading: false });
-    }
-  }
+    };
+    fetchImages();
+  }, [page, searchQuery]);
 
-  searchImages = ({ search }) => {
-    if (search !== this.state.search) {
-      this.setState({ search, items: [], page: 1 });
+  const searchImages = query => {
+    if (query !== searchQuery) {
+      setPage(1);
+      setItems([]);
+      setSearchQuery(query);
     } else toast('you have already entered this query!');
   };
 
-  loadMore = () => {
-    this.setState(({ page }) => ({ page: page + 1 }));
-  };
+  const loadMore = useCallback(() => {
+    setPage(prevPage => prevPage + 1);
+  }, []);
 
-  openModal = (largeImageURL, tags) => {
-    this.setState({
-      showModal: true,
-      imgDetails: { largeImageURL, tags },
-    });
-  };
+  const openModal = useCallback((largeImageURL, tags) => {
+    setShowModal(true);
+    setimgDetails({ largeImageURL, tags });
+  }, []);
 
-  closeModal = () => {
-    this.setState({
-      showModal: false,
-      imgDetails: null,
-    });
-  };
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+    setimgDetails(null);
+  }, []);
 
-  render() {
-    const body = document.querySelector('body');
-    const { items, loading, err, showModal, imgDetails } = this.state;
-    const { searchImages, loadMore, closeModal, openModal } = this;
+  const body = document.querySelector('body');
+  const isImages = Boolean(items.length);
+  const totalPage = Math.ceil(total / 12);
 
-    return (
-      <div className={styles.search_images}>
-        <Searchbar onSubmit={searchImages} />
-        {items.length > 0 && <ImageGallery items={items} onClick={openModal} />}
+  return (
+    <div className={styles.search_images}>
+      <Searchbar onSubmit={searchImages} />
+      <ImageGallery items={items} onClick={openModal} />
 
-        {err && <p className={styles.errorMessage}>{err}</p>}
+      {loading && <Loader />}
 
-        {loading && <Loader />}
-        {Boolean(items.length) && !loading && (
-          <Button onLoadMore={loadMore} text={'Load more'} />
-        )}
+      {err && <p className={styles.errorMessage}>{err}</p>}
 
-        {showModal
-          ? body.classList.add('overflow-hidden')
-          : body.classList.remove('overflow-hidden')}
+      {isImages && page < totalPage && !loading && (
+        <Button onLoadMore={loadMore} text={'Load more'} />
+      )}
 
-        {showModal && (
-          <Modal close={closeModal}>
-            <img src={imgDetails.largeImageURL} alt={imgDetails.tags} />
-          </Modal>
-        )}
-      </div>
-    );
-  }
-}
+      {showModal
+        ? body.classList.add('overflow-hidden')
+        : body.classList.remove('overflow-hidden')}
+
+      {showModal && (
+        <Modal close={closeModal}>
+          <img src={imgDetails.largeImageURL} alt={imgDetails.tags} />
+        </Modal>
+      )}
+    </div>
+  );
+};
 
 export default SearchImages;
