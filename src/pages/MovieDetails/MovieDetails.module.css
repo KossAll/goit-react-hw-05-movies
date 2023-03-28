@@ -1,0 +1,44 @@
+.line {
+    width: 100%;
+    height: 1px;
+    background-color: gray;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.secondTitle {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.listLink {
+    padding-top: 20px;
+}
+
+.item {
+    margin-bottom: 10px;
+}
+
+.itemLink {
+    color: #3498db;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;}
+
+        .itemLink:hover,
+        .itemLink:focus {
+        text-decoration: underline;
+}
+
+.btn {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    color: #3498db;
+    font-size: 14px;
+    font-weight: 700;
+    background-color: transparent;
+    border: none;
+    height: 20px;
+    cursor: pointer;
+}

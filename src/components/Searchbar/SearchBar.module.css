@@ -1,0 +1,32 @@
+.input {
+    width: 200px;
+    height: 40px;
+    padding-left: 10px;
+    padding-right: 50px;
+    padding-top: 0;
+    padding-bottom: 0;
+    border: 2px solid #3498db;
+}
+
+    .input:focus {
+        outline: none;
+    }
+
+
+.btn {
+    position: absolute;
+    left: 280px;
+    width: 39px;
+    height: 36px;
+    margin: 0;
+    background-color: #3498db4f;
+    border: none;
+    cursor: pointer;
+}
+
+.form {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
